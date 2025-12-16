@@ -40,14 +40,11 @@ function checkAdminAuth($redirect = true) {
     // Vérifier si la session existe
     if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
         if ($redirect) {
-            // Utiliser un chemin absolu pour éviter les boucles de redirection
-            $loginUrl = dirname($_SERVER['SCRIPT_NAME']);
-            // Remonter au dossier parent si on est dans /admin
-            if (basename($loginUrl) === 'admin') {
-                $loginUrl = dirname($loginUrl);
+            // Charger config-path.php si pas déjà chargé
+            if (!defined('ADMIN_URL')) {
+                require_once __DIR__ . '/../admin/config-path.php';
             }
-            $loginUrl .= '/admin/index.php?error=not_logged_in';
-            header('Location: ' . $loginUrl);
+            header('Location: ' . ADMIN_URL . '/index.php?error=not_logged_in');
             exit;
         }
         return false;
@@ -57,14 +54,11 @@ function checkAdminAuth($redirect = true) {
     if (!isset($_SESSION['login_time']) || (time() - $_SESSION['login_time']) > SESSION_LIFETIME) {
         logoutAdmin();
         if ($redirect) {
-            // Utiliser un chemin absolu pour éviter les boucles de redirection
-            $loginUrl = dirname($_SERVER['SCRIPT_NAME']);
-            // Remonter au dossier parent si on est dans /admin
-            if (basename($loginUrl) === 'admin') {
-                $loginUrl = dirname($loginUrl);
+            // Charger config-path.php si pas déjà chargé
+            if (!defined('ADMIN_URL')) {
+                require_once __DIR__ . '/../admin/config-path.php';
             }
-            $loginUrl .= '/admin/index.php?error=session_expired';
-            header('Location: ' . $loginUrl);
+            header('Location: ' . ADMIN_URL . '/index.php?error=session_expired');
             exit;
         }
         return false;
