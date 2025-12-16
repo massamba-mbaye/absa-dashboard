@@ -22,6 +22,35 @@ $isAdmin = isAdmin();
     <title>Gestion des Admins - ABSA Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style-admin.css">
+    <style>
+        /* Skeleton loader pour les stats */
+        .stat-skeleton {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skeleton-loader {
+            width: 60px;
+            height: 32px;
+            background: linear-gradient(90deg, #2a2a3a 25%, #3a3a4a 50%, #2a2a3a 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s ease-in-out infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes skeleton-loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .stat-skeleton.loaded .skeleton-loader {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <?php include __DIR__ . '/includes/sidebar.php'; ?>
@@ -54,7 +83,9 @@ $isAdmin = isAdmin();
                     </svg>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-value" id="stat-total">0</div>
+                    <div class="stat-value stat-skeleton" id="stat-total">
+                        <div class="skeleton-loader"></div>
+                    </div>
                     <div class="stat-label">Total Admins</div>
                 </div>
             </div>
@@ -66,7 +97,9 @@ $isAdmin = isAdmin();
                     </svg>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-value" id="stat-admins">0</div>
+                    <div class="stat-value stat-skeleton" id="stat-admins">
+                        <div class="skeleton-loader"></div>
+                    </div>
                     <div class="stat-label">Administrateurs</div>
                 </div>
             </div>
@@ -79,7 +112,9 @@ $isAdmin = isAdmin();
                     </svg>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-value" id="stat-viewers">0</div>
+                    <div class="stat-value stat-skeleton" id="stat-viewers">
+                        <div class="skeleton-loader"></div>
+                    </div>
                     <div class="stat-label">Lecture Seule</div>
                 </div>
             </div>
@@ -91,7 +126,9 @@ $isAdmin = isAdmin();
                     </svg>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-value" id="stat-active">0</div>
+                    <div class="stat-value stat-skeleton" id="stat-active">
+                        <div class="skeleton-loader"></div>
+                    </div>
                     <div class="stat-label">Actifs</div>
                 </div>
             </div>
@@ -217,10 +254,22 @@ $isAdmin = isAdmin();
             }
 
             if (statsData.success) {
-                document.getElementById('stat-total').textContent = statsData.data.total;
-                document.getElementById('stat-admins').textContent = statsData.data.admins;
-                document.getElementById('stat-viewers').textContent = statsData.data.viewers;
-                document.getElementById('stat-active').textContent = statsData.data.active;
+                // Mettre à jour les stats et retirer le loader
+                const statTotal = document.getElementById('stat-total');
+                const statAdmins = document.getElementById('stat-admins');
+                const statViewers = document.getElementById('stat-viewers');
+                const statActive = document.getElementById('stat-active');
+
+                statTotal.textContent = statsData.data.total;
+                statAdmins.textContent = statsData.data.admins;
+                statViewers.textContent = statsData.data.viewers;
+                statActive.textContent = statsData.data.active;
+
+                // Retirer le skeleton loader
+                statTotal.classList.add('loaded');
+                statAdmins.classList.add('loaded');
+                statViewers.classList.add('loaded');
+                statActive.classList.add('loaded');
             }
 
             document.getElementById('loading').style.display = 'none';
