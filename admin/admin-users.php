@@ -197,8 +197,8 @@ $adminName = getAdminName();
             document.getElementById('no-data').style.display = 'none';
 
             const [usersRes, statsRes] = await Promise.all([
-                fetch('/absa-dashboard/api/admin/admin-users-management.php?action=list'),
-                fetch('/absa-dashboard/api/admin/admin-users-management.php?action=stats')
+                fetch('<?= apiUrl('admin-users-management', ['action' => 'list']) ?>'),
+                fetch('<?= apiUrl('admin-users-management', ['action' => 'stats']) ?>')
             ]);
 
             const usersData = await usersRes.json();
@@ -343,7 +343,7 @@ $adminName = getAdminName();
         formData.append('action', action);
 
         try {
-            const response = await fetch('/absa-dashboard/api/admin/admin-users-management.php', {
+            const response = await fetch('<?= apiUrl('admin-users-management') ?>', {
                 method: 'POST',
                 body: formData
             });
@@ -372,7 +372,7 @@ $adminName = getAdminName();
             formData.append('action', 'toggle_status');
             formData.append('id', id);
 
-            const response = await fetch('/absa-dashboard/api/admin/admin-users-management.php', {
+            const response = await fetch('<?= apiUrl('admin-users-management') ?>', {
                 method: 'POST',
                 body: formData
             });
@@ -399,7 +399,7 @@ $adminName = getAdminName();
             formData.append('action', 'delete');
             formData.append('id', id);
 
-            const response = await fetch('/absa-dashboard/api/admin/admin-users-management.php', {
+            const response = await fetch('<?= apiUrl('admin-users-management') ?>', {
                 method: 'POST',
                 body: formData
             });

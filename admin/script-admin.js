@@ -25,7 +25,7 @@ const ADMIN_CONFIG = {
 function initSessionMonitoring() {
     // Vérification immédiate
     checkSession();
-    
+
     // Vérifier toutes les 5 minutes
     setInterval(checkSession, ADMIN_CONFIG.SESSION_CHECK_INTERVAL);
 }
@@ -37,14 +37,12 @@ async function checkSession() {
     try {
         const response = await fetch(ADMIN_CONFIG.API_BASE + 'auth.php?action=check-session');
         const data = await response.json();
-        
+
         if (!data.success || !data.data.logged_in) {
             // Session expirée
             showSessionExpiredModal();
-        } else if (data.data.session.expiring_soon) {
-            // Session arrive à expiration
-            showSessionWarning(data.data.session.time_remaining);
         }
+        // Suppression de l'alerte d'expiration - notification désactivée
     } catch (error) {
         console.error('Erreur vérification session:', error);
     }
