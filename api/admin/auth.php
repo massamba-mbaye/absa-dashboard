@@ -235,18 +235,54 @@ function handleRefreshSession() {
 function verifyCredentials($username, $password) {
     try {
         $db = getDB();
-        
-        // Chercher l'admin dans la base de données
+
+        // D'abord, chercher dans la table public.users (système principal)
+        $stmt = $db->prepare("
+            SELECT id, email, password_hash, first_name, last_name, role, is_active
+            FROM public.users
+            WHERE email = :email
+            LIMIT 1
+        ");
+
+        $stmt->execute(['email' => $username]);
+        $user = $stmt->fetch();
+
+        // Si l'utilisateur existe dans public.users
+        if ($user) {
+            // Vérifier le mot de passe hashé
+            if (password_verify($password, $user['password_hash'])) {
+                // Vérifier si le compte est actif
+                if (!$user['is_active']) {
+                    error_log("⚠️ Tentative de connexion sur compte désactivé: $username");
+                    return false;
+                }
+
+                // Construire le nom complet
+                $fullName = trim($user['first_name'] . ' ' . $user['last_name']);
+                if (empty($fullName)) {
+                    $fullName = $user['email'];
+                }
+
+                return [
+                    'id' => $user['id'],
+                    'username' => $user['email'],
+                    'name' => $fullName,
+                    'email' => $user['email']
+                ];
+            }
+        }
+
+        // Fallback : chercher dans l'ancienne table admins (rétrocompatibilité)
         $stmt = $db->prepare("
             SELECT id, username, password_hash, name, email, active
             FROM admins
             WHERE username = :username
             LIMIT 1
         ");
-        
+
         $stmt->execute(['username' => $username]);
         $admin = $stmt->fetch();
-        
+
         // Si l'admin existe en DB
         if ($admin) {
             // Vérifier le mot de passe hashé
@@ -256,7 +292,7 @@ function verifyCredentials($username, $password) {
                     error_log("⚠️ Tentative de connexion sur compte désactivé: $username");
                     return false;
                 }
-                
+
                 return [
                     'id' => $admin['id'],
                     'username' => $admin['username'],
@@ -265,11 +301,11 @@ function verifyCredentials($username, $password) {
                 ];
             }
         }
-        
+
     } catch (Exception $e) {
         error_log("❌ Erreur lors de la vérification des credentials: " . $e->getMessage());
     }
-    
+
     // Fallback : vérifier avec les credentials du .env (compte par défaut)
     return verifyDefaultCredentials($username, $password);
 }
