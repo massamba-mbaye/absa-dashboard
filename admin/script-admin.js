@@ -836,6 +836,31 @@ function hideLoader() {
 }
 
 // ============================================
+// DÉCONNEXION
+// ============================================
+
+/**
+ * Déconnecte l'utilisateur admin
+ */
+async function logout() {
+    try {
+        const response = await fetch(ADMIN_CONFIG.API_BASE + 'auth.php?action=logout', {
+            method: 'POST'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            window.location.href = 'index.php';
+        }
+    } catch (error) {
+        console.error('Erreur déconnexion:', error);
+        // Rediriger vers index.php même en cas d'erreur
+        window.location.href = 'index.php';
+    }
+}
+
+// ============================================
 // EXPORT DES FONCTIONS (NAMESPACE)
 // ============================================
 
@@ -853,7 +878,8 @@ window.adminUtils = {
     debounce,
     showLoader,
     hideLoader,
-    refreshSession
+    refreshSession,
+    logout
 };
 
 // ============================================
