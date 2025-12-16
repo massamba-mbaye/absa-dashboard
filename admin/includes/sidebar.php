@@ -30,13 +30,9 @@
             <i class="fas fa-heart"></i>
             <span>Analyse Émotions</span>
         </a>
-        <a href="diagnostic.php" class="nav-item <?= basename($_SERVER['PHP_SELF']) == 'diagnostic.php' ? 'active' : '' ?>">
-            <i class="fas fa-stethoscope"></i>
-            <span>Diagnostic</span>
-        </a>
         <a href="admin-users.php" class="nav-item <?= basename($_SERVER['PHP_SELF']) == 'admin-users.php' ? 'active' : '' ?>">
             <i class="fas fa-user-shield"></i>
-            <span>Admins</span>
+            <span>Administrateurs</span>
         </a>
     </nav>
 
