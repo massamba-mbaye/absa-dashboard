@@ -94,6 +94,7 @@ function getCurrentAdmin() {
         'username' => $_SESSION['admin_username'] ?? 'admin',
         'name' => $_SESSION['admin_name'] ?? 'Administrateur',
         'email' => $_SESSION['admin_email'] ?? null,
+        'role' => $_SESSION['admin_role'] ?? 'viewer',
         'login_time' => $_SESSION['login_time'] ?? time(),
         'last_activity' => $_SESSION['last_activity'] ?? time()
     ];
@@ -110,7 +111,7 @@ function getAdminName() {
 
 /**
  * Récupère l'ID de l'admin connecté
- * 
+ *
  * @return int|null ID admin ou null
  */
 function getAdminId() {
@@ -118,8 +119,59 @@ function getAdminId() {
 }
 
 /**
+ * Récupère le rôle de l'admin connecté
+ *
+ * @return string Rôle (admin ou viewer)
+ */
+function getAdminRole() {
+    return $_SESSION['admin_role'] ?? 'viewer';
+}
+
+/**
+ * Vérifie si l'admin connecté a le rôle admin
+ *
+ * @return bool True si admin
+ */
+function isAdmin() {
+    return getAdminRole() === 'admin';
+}
+
+/**
+ * Vérifie si l'admin connecté a le rôle viewer
+ *
+ * @return bool True si viewer
+ */
+function isViewer() {
+    return getAdminRole() === 'viewer';
+}
+
+/**
+ * Vérifie si l'utilisateur a la permission de modifier
+ * Redirige avec erreur si pas de permission
+ *
+ * @param bool $redirect Si true, redirige automatiquement
+ * @return bool True si autorisé
+ */
+function checkAdminPermission($redirect = true) {
+    if (!isAdmin()) {
+        if ($redirect) {
+            http_response_code(403);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'error' => 'Accès refusé. Vous n\'avez pas les permissions nécessaires.',
+                'code' => 'PERMISSION_DENIED'
+            ]);
+            exit;
+        }
+        return false;
+    }
+    return true;
+}
+
+/**
  * Vérifie le temps restant avant expiration
- * 
+ *
  * @return int Secondes restantes
  */
 function getSessionTimeRemaining() {
@@ -240,22 +292,23 @@ function resetLoginAttempts($username) {
 function loginAdmin($adminData) {
     // Régénérer l'ID de session pour sécurité
     session_regenerate_id(true);
-    
+
     // Définir les variables de session
     $_SESSION['admin_logged_in'] = true;
     $_SESSION['admin_id'] = $adminData['id'] ?? null;
     $_SESSION['admin_username'] = $adminData['username'] ?? 'admin';
     $_SESSION['admin_name'] = $adminData['name'] ?? $adminData['username'] ?? 'Admin';
     $_SESSION['admin_email'] = $adminData['email'] ?? null;
+    $_SESSION['admin_role'] = $adminData['role'] ?? 'viewer';
     $_SESSION['login_time'] = time();
     $_SESSION['last_activity'] = time();
     $_SESSION['login_ip'] = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    
+
     // Réinitialiser les tentatives de connexion
     if (isset($adminData['username'])) {
         resetLoginAttempts($adminData['username']);
     }
-    
+
     return true;
 }
 

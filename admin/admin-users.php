@@ -11,6 +11,8 @@ checkAdminAuth();
 
 // Récupérer les infos admin pour le sidebar
 $adminName = getAdminName();
+$adminRole = getAdminRole();
+$isAdmin = isAdmin();
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -30,12 +32,14 @@ $adminName = getAdminName();
                 <h1>Gestion des Administrateurs</h1>
                 <p class="subtitle">Gérer les comptes d'accès au dashboard</p>
             </div>
+            <?php if ($isAdmin): ?>
             <button class="btn btn-primary" onclick="openCreateModal()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 5v14M5 12h14"/>
                 </svg>
                 Nouvel admin
             </button>
+            <?php endif; ?>
         </header>
 
         <!-- Stats -->
@@ -186,6 +190,9 @@ $adminName = getAdminName();
 
     <script src="script-admin.js"></script>
     <script>
+    // Rôle de l'utilisateur connecté
+    const isAdmin = <?= $isAdmin ? 'true' : 'false' ?>;
+
     let users = [];
     let editMode = false;
 
@@ -262,6 +269,7 @@ $adminName = getAdminName();
                 </td>
                 <td>${user.last_login ? formatDate(user.last_login) : 'Jamais'}</td>
                 <td>
+                    ${isAdmin ? `
                     <div style="display: flex; gap: 8px;">
                         <button class="btn-icon" onclick="editUser(${user.id})" title="Modifier">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -283,6 +291,7 @@ $adminName = getAdminName();
                             </svg>
                         </button>
                     </div>
+                    ` : '<span style="color: #9ca3af; font-style: italic;">Lecture seule</span>'}
                 </td>
             </tr>
         `).join('');

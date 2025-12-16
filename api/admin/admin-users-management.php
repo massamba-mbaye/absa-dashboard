@@ -125,12 +125,15 @@ try {
         // CRÉER UN ADMIN
         // ====================================
         case 'create':
+            // Vérifier les permissions
+            checkAdminPermission();
+
             $email = trim($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
             $firstName = trim($_POST['first_name'] ?? '');
             $lastName = trim($_POST['last_name'] ?? '');
             $role = $_POST['role'] ?? 'viewer';
-            
+
             // Validation
             if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 jsonError('Email invalide');
@@ -182,6 +185,9 @@ try {
         // MODIFIER UN ADMIN
         // ====================================
         case 'update':
+            // Vérifier les permissions
+            checkAdminPermission();
+
             $userId = (int)($_POST['id'] ?? 0);
             if (!$userId) jsonError('ID utilisateur manquant');
             
@@ -233,6 +239,9 @@ try {
         // RÉINITIALISER MOT DE PASSE
         // ====================================
         case 'reset_password':
+            // Vérifier les permissions
+            checkAdminPermission();
+
             $userId = (int)($_POST['id'] ?? 0);
             $newPassword = $_POST['new_password'] ?? '';
             
@@ -262,6 +271,9 @@ try {
         // ACTIVER/DÉSACTIVER UN ADMIN
         // ====================================
         case 'toggle_status':
+            // Vérifier les permissions
+            checkAdminPermission();
+
             $userId = (int)($_POST['id'] ?? 0);
             if (!$userId) jsonError('ID utilisateur manquant');
             
@@ -291,6 +303,9 @@ try {
         // SUPPRIMER UN ADMIN
         // ====================================
         case 'delete':
+            // Vérifier les permissions
+            checkAdminPermission();
+
             $userId = (int)($_POST['id'] ?? 0);
             if (!$userId) jsonError('ID utilisateur manquant');
             

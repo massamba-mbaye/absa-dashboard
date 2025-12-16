@@ -267,7 +267,8 @@ function verifyCredentials($username, $password) {
                     'id' => $user['id'],
                     'username' => $user['email'],
                     'name' => $fullName,
-                    'email' => $user['email']
+                    'email' => $user['email'],
+                    'role' => $user['role']
                 ];
             }
         }
