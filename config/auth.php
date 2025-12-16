@@ -32,7 +32,7 @@ define('LOGIN_BLOCK_DURATION', 900);
 /**
  * Vérifie si l'admin est connecté
  * Redirige vers la page de login si non connecté
- * 
+ *
  * @param bool $redirect Si true, redirige automatiquement
  * @return bool True si connecté, False sinon
  */
@@ -40,25 +40,39 @@ function checkAdminAuth($redirect = true) {
     // Vérifier si la session existe
     if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
         if ($redirect) {
-            header('Location: index.php?error=not_logged_in');
+            // Utiliser un chemin absolu pour éviter les boucles de redirection
+            $loginUrl = dirname($_SERVER['SCRIPT_NAME']);
+            // Remonter au dossier parent si on est dans /admin
+            if (basename($loginUrl) === 'admin') {
+                $loginUrl = dirname($loginUrl);
+            }
+            $loginUrl .= '/admin/index.php?error=not_logged_in';
+            header('Location: ' . $loginUrl);
             exit;
         }
         return false;
     }
-    
+
     // Vérifier l'expiration de la session (2 heures)
     if (!isset($_SESSION['login_time']) || (time() - $_SESSION['login_time']) > SESSION_LIFETIME) {
         logoutAdmin();
         if ($redirect) {
-            header('Location: index.php?error=session_expired');
+            // Utiliser un chemin absolu pour éviter les boucles de redirection
+            $loginUrl = dirname($_SERVER['SCRIPT_NAME']);
+            // Remonter au dossier parent si on est dans /admin
+            if (basename($loginUrl) === 'admin') {
+                $loginUrl = dirname($loginUrl);
+            }
+            $loginUrl .= '/admin/index.php?error=session_expired';
+            header('Location: ' . $loginUrl);
             exit;
         }
         return false;
     }
-    
+
     // Mettre à jour l'activité
     $_SESSION['last_activity'] = time();
-    
+
     return true;
 }
 
