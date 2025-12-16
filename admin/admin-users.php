@@ -22,35 +22,7 @@ $isAdmin = isAdmin();
     <title>Gestion des Admins - ABSA Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style-admin.css">
-    <style>
-        /* Skeleton loader pour les stats */
-        .stat-skeleton {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .skeleton-loader {
-            width: 60px;
-            height: 32px;
-            background: linear-gradient(90deg, #2a2a3a 25%, #3a3a4a 50%, #2a2a3a 75%);
-            background-size: 200% 100%;
-            animation: skeleton-loading 1.5s ease-in-out infinite;
-            border-radius: 8px;
-        }
-
-        @keyframes skeleton-loading {
-            0% {
-                background-position: 200% 0;
-            }
-            100% {
-                background-position: -200% 0;
-            }
-        }
-
-        .stat-skeleton.loaded .skeleton-loader {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="skeleton-loader.css">
 </head>
 <body>
     <?php include __DIR__ . '/includes/sidebar.php'; ?>
@@ -82,11 +54,11 @@ $isAdmin = isAdmin();
                         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-value stat-skeleton" id="stat-total">
+                <div class="stat-info">
+                    <h3 class="stat-skeleton" id="stat-total">
                         <div class="skeleton-loader"></div>
-                    </div>
-                    <div class="stat-label">Total Admins</div>
+                    </h3>
+                    <p>Total Admins</p>
                 </div>
             </div>
 
@@ -96,11 +68,11 @@ $isAdmin = isAdmin();
                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
                     </svg>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-value stat-skeleton" id="stat-admins">
+                <div class="stat-info">
+                    <h3 class="stat-skeleton" id="stat-admins">
                         <div class="skeleton-loader"></div>
-                    </div>
-                    <div class="stat-label">Administrateurs</div>
+                    </h3>
+                    <p>Administrateurs</p>
                 </div>
             </div>
 
@@ -111,11 +83,11 @@ $isAdmin = isAdmin();
                         <circle cx="12" cy="12" r="3"></circle>
                     </svg>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-value stat-skeleton" id="stat-viewers">
+                <div class="stat-info">
+                    <h3 class="stat-skeleton" id="stat-viewers">
                         <div class="skeleton-loader"></div>
-                    </div>
-                    <div class="stat-label">Lecture Seule</div>
+                    </h3>
+                    <p>Lecture Seule</p>
                 </div>
             </div>
 
@@ -125,11 +97,11 @@ $isAdmin = isAdmin();
                         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                     </svg>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-value stat-skeleton" id="stat-active">
+                <div class="stat-info">
+                    <h3 class="stat-skeleton" id="stat-active">
                         <div class="skeleton-loader"></div>
-                    </div>
-                    <div class="stat-label">Actifs</div>
+                    </h3>
+                    <p>Actifs</p>
                 </div>
             </div>
         </div>

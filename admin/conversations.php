@@ -26,9 +26,10 @@ $adminName = getAdminName();
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <!-- CSS Admin -->
     <link rel="stylesheet" href="style-admin.css">
+    <link rel="stylesheet" href="skeleton-loader.css">
 </head>
 <body>
     
@@ -66,37 +67,45 @@ $adminName = getAdminName();
                     <i class="fas fa-comments"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="stat-total-conversations">0</h3>
+                    <h3 class="stat-skeleton" id="stat-total-conversations">
+                        <div class="skeleton-loader skeleton-loader-wide"></div>
+                    </h3>
                     <p>Total Conversations</p>
                 </div>
             </div>
-            
+
             <div class="stat-card green">
                 <div class="stat-icon">
                     <i class="fas fa-envelope"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="stat-total-messages">0</h3>
+                    <h3 class="stat-skeleton" id="stat-total-messages">
+                        <div class="skeleton-loader skeleton-loader-wide"></div>
+                    </h3>
                     <p>Total Messages</p>
                 </div>
             </div>
-            
+
             <div class="stat-card purple">
                 <div class="stat-icon">
                     <i class="fas fa-smile"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="stat-positive-rate">0%</h3>
+                    <h3 class="stat-skeleton" id="stat-positive-rate">
+                        <div class="skeleton-loader"></div>
+                    </h3>
                     <p>Taux Positifs</p>
                 </div>
             </div>
-            
+
             <div class="stat-card orange">
                 <div class="stat-icon">
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="stat-urgent-conversations">0</h3>
+                    <h3 class="stat-skeleton" id="stat-urgent-conversations">
+                        <div class="skeleton-loader skeleton-loader-wide"></div>
+                    </h3>
                     <p>Conversations Urgentes</p>
                     <span class="stat-badge danger">Niveau ≥ 4</span>
                 </div>
@@ -231,13 +240,25 @@ $adminName = getAdminName();
             try {
                 const response = await fetch('<?= apiUrl('conversations-management', ['action' => 'stats']) ?>');
                 const result = await response.json();
-                
+
                 if (result.success) {
                     const stats = result.data;
-                    document.getElementById('stat-total-conversations').textContent = adminUtils.formatNumber(stats.total_conversations);
-                    document.getElementById('stat-total-messages').textContent = adminUtils.formatNumber(stats.total_messages);
-                    document.getElementById('stat-positive-rate').textContent = stats.positive_rate + '%';
-                    document.getElementById('stat-urgent-conversations').textContent = adminUtils.formatNumber(stats.urgent_conversations);
+
+                    const statTotalConversations = document.getElementById('stat-total-conversations');
+                    statTotalConversations.textContent = adminUtils.formatNumber(stats.total_conversations);
+                    statTotalConversations.classList.add('loaded');
+
+                    const statTotalMessages = document.getElementById('stat-total-messages');
+                    statTotalMessages.textContent = adminUtils.formatNumber(stats.total_messages);
+                    statTotalMessages.classList.add('loaded');
+
+                    const statPositiveRate = document.getElementById('stat-positive-rate');
+                    statPositiveRate.textContent = stats.positive_rate + '%';
+                    statPositiveRate.classList.add('loaded');
+
+                    const statUrgentConversations = document.getElementById('stat-urgent-conversations');
+                    statUrgentConversations.textContent = adminUtils.formatNumber(stats.urgent_conversations);
+                    statUrgentConversations.classList.add('loaded');
                 }
             } catch (error) {
                 console.error('Erreur stats:', error);

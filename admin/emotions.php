@@ -26,10 +26,11 @@ $adminName = getAdminName();
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <!-- CSS Admin -->
     <link rel="stylesheet" href="style-admin.css">
-    
+    <link rel="stylesheet" href="skeleton-loader.css">
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
@@ -73,38 +74,46 @@ $adminName = getAdminName();
                     <i class="fas fa-chart-bar"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="stat-total-analyses">0</h3>
+                    <h3 class="stat-skeleton" id="stat-total-analyses">
+                        <div class="skeleton-loader skeleton-loader-wide"></div>
+                    </h3>
                     <p>Analyses Effectuées</p>
                 </div>
             </div>
-            
+
             <div class="stat-card green">
                 <div class="stat-icon">
                     <i class="fas fa-tachometer-alt"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="stat-avg-urgency">0</h3>
+                    <h3 class="stat-skeleton" id="stat-avg-urgency">
+                        <div class="skeleton-loader"></div>
+                    </h3>
                     <p>Urgence Moyenne</p>
                 </div>
             </div>
-            
+
             <div class="stat-card orange">
                 <div class="stat-icon">
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="stat-urgent-cases">0</h3>
+                    <h3 class="stat-skeleton" id="stat-urgent-cases">
+                        <div class="skeleton-loader skeleton-loader-wide"></div>
+                    </h3>
                     <p>Cas Urgents</p>
                     <span class="stat-badge danger">Niveau ≥ 4</span>
                 </div>
             </div>
-            
+
             <div class="stat-card purple">
                 <div class="stat-icon">
                     <i class="fas fa-exclamation-circle"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="stat-violence-reported">0</h3>
+                    <h3 class="stat-skeleton" id="stat-violence-reported">
+                        <div class="skeleton-loader skeleton-loader-wide"></div>
+                    </h3>
                     <p>Violences Signalées</p>
                 </div>
             </div>
@@ -267,10 +276,21 @@ $adminName = getAdminName();
         // ============================================
         
         function displayStats(stats) {
-            document.getElementById('stat-total-analyses').textContent = adminUtils.formatNumber(stats.total_analyses);
-            document.getElementById('stat-avg-urgency').textContent = stats.avg_urgency.toFixed(2);
-            document.getElementById('stat-urgent-cases').textContent = adminUtils.formatNumber(stats.urgent_cases);
-            document.getElementById('stat-violence-reported').textContent = adminUtils.formatNumber(stats.violence_reported);
+            const statTotalAnalyses = document.getElementById('stat-total-analyses');
+            statTotalAnalyses.textContent = adminUtils.formatNumber(stats.total_analyses);
+            statTotalAnalyses.classList.add('loaded');
+
+            const statAvgUrgency = document.getElementById('stat-avg-urgency');
+            statAvgUrgency.textContent = stats.avg_urgency.toFixed(2);
+            statAvgUrgency.classList.add('loaded');
+
+            const statUrgentCases = document.getElementById('stat-urgent-cases');
+            statUrgentCases.textContent = adminUtils.formatNumber(stats.urgent_cases);
+            statUrgentCases.classList.add('loaded');
+
+            const statViolenceReported = document.getElementById('stat-violence-reported');
+            statViolenceReported.textContent = adminUtils.formatNumber(stats.violence_reported);
+            statViolenceReported.classList.add('loaded');
         }
         
         // ============================================

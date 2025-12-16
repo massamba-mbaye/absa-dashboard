@@ -26,10 +26,11 @@ $adminName = getAdminName();
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <!-- CSS Admin -->
     <link rel="stylesheet" href="style-admin.css">
-    
+    <link rel="stylesheet" href="skeleton-loader.css">
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
@@ -73,43 +74,51 @@ $adminName = getAdminName();
                         <i class="fas fa-users"></i>
                     </div>
                     <div class="stat-info">
-                        <h3 id="stat-users">0</h3>
-                        <p>Utilisateurs</p>
+                        <h3 class="stat-skeleton" id="stat-users">
+                            <div class="skeleton-loader skeleton-loader-wide"></div>
+                        </h3>
+                        <p>Utilisateurs ABSA</p>
                         <span class="stat-badge" id="stat-users-badge"></span>
                     </div>
                 </div>
-                
+
                 <!-- Conversations -->
                 <div class="stat-card green">
                     <div class="stat-icon">
                         <i class="fas fa-comments"></i>
                     </div>
                     <div class="stat-info">
-                        <h3 id="stat-conversations">0</h3>
+                        <h3 class="stat-skeleton" id="stat-conversations">
+                            <div class="skeleton-loader skeleton-loader-wide"></div>
+                        </h3>
                         <p>Conversations</p>
                         <span class="stat-badge" id="stat-conversations-badge"></span>
                     </div>
                 </div>
-                
+
                 <!-- Messages -->
                 <div class="stat-card purple">
                     <div class="stat-icon">
                         <i class="fas fa-envelope"></i>
                     </div>
                     <div class="stat-info">
-                        <h3 id="stat-messages">0</h3>
+                        <h3 class="stat-skeleton" id="stat-messages">
+                            <div class="skeleton-loader skeleton-loader-wide"></div>
+                        </h3>
                         <p>Messages</p>
                         <span class="stat-badge" id="stat-messages-badge"></span>
                     </div>
                 </div>
-                
+
                 <!-- Urgences -->
                 <div class="stat-card orange">
                     <div class="stat-icon">
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
                     <div class="stat-info">
-                        <h3 id="stat-urgencies">0</h3>
+                        <h3 class="stat-skeleton" id="stat-urgencies">
+                            <div class="skeleton-loader skeleton-loader-wide"></div>
+                        </h3>
                         <p>Urgences</p>
                         <span class="stat-badge danger" id="stat-urgencies-badge">Niveau ≥ 4</span>
                     </div>
@@ -263,23 +272,30 @@ $adminName = getAdminName();
         
         function displayGlobalStats(stats) {
             // Utilisateurs
-            document.getElementById('stat-users').textContent = adminUtils.formatNumber(stats.users.total);
-            
+            const statUsers = document.getElementById('stat-users');
+            statUsers.textContent = adminUtils.formatNumber(stats.users.total);
+            statUsers.classList.add('loaded');
+
             // Conversations
-            document.getElementById('stat-conversations').textContent = adminUtils.formatNumber(stats.conversations.total);
+            const statConversations = document.getElementById('stat-conversations');
+            statConversations.textContent = adminUtils.formatNumber(stats.conversations.total);
+            statConversations.classList.add('loaded');
             const convBadge = document.getElementById('stat-conversations-badge');
             if (stats.conversations.badge) {
                 convBadge.textContent = stats.conversations.badge;
                 convBadge.style.display = 'inline-block';
             }
-            
+
             // Messages
-            document.getElementById('stat-messages').textContent = adminUtils.formatNumber(stats.messages.total);
-            
+            const statMessages = document.getElementById('stat-messages');
+            statMessages.textContent = adminUtils.formatNumber(stats.messages.total);
+            statMessages.classList.add('loaded');
+
             // Urgences
             const urgenciesEl = document.getElementById('stat-urgencies');
             urgenciesEl.textContent = adminUtils.formatNumber(stats.urgencies.total);
-            
+            urgenciesEl.classList.add('loaded');
+
             // Ajouter classe danger si urgences
             if (stats.urgencies.is_danger && stats.urgencies.total > 0) {
                 urgenciesEl.style.color = '#ff6b6b';

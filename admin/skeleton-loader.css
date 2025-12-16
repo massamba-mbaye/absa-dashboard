@@ -1,0 +1,47 @@
+/**
+ * SKELETON LOADER - Animation de chargement
+ * Style réutilisable pour toutes les pages du dashboard
+ */
+
+/* Conteneur skeleton */
+.stat-skeleton {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Barre animée avec gradient */
+.skeleton-loader {
+    width: 60px;
+    height: 32px;
+    background: linear-gradient(90deg, #2a2a3a 25%, #3a3a4a 50%, #2a2a3a 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+/* Animation de déplacement du gradient */
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Masquer le loader quand les données sont chargées */
+.stat-skeleton.loaded .skeleton-loader {
+    display: none;
+}
+
+/* Variante pour les textes plus larges */
+.skeleton-loader-wide {
+    width: 120px;
+}
+
+/* Variante pour les textes courts */
+.skeleton-loader-small {
+    width: 40px;
+    height: 24px;
+}

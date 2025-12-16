@@ -48,12 +48,11 @@ try {
     // ============================================
     // 1. STATISTIQUES GLOBALES
     // ============================================
-    
-    // Total utilisateurs uniques
+
+    // Total utilisateurs uniques (TOUS les utilisateurs WhatsApp, pas seulement la période)
     $stmtUsers = $db->query("
         SELECT COUNT(DISTINCT wa_id) as total
         FROM public.conversations
-        WHERE started_at >= '{$dateLimit}'
     ");
     $totalUsers = (int)$stmtUsers->fetch(PDO::FETCH_ASSOC)['total'];
     

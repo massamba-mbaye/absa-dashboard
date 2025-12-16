@@ -26,9 +26,10 @@ $adminName = getAdminName();
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <!-- CSS Admin -->
     <link rel="stylesheet" href="style-admin.css">
+    <link rel="stylesheet" href="skeleton-loader.css">
 </head>
 <body>
     
@@ -66,37 +67,45 @@ $adminName = getAdminName();
                     <i class="fas fa-users"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="stat-total-users">0</h3>
+                    <h3 class="stat-skeleton" id="stat-total-users">
+                        <div class="skeleton-loader skeleton-loader-wide"></div>
+                    </h3>
                     <p>Total Utilisateurs</p>
                 </div>
             </div>
-            
+
             <div class="stat-card green">
                 <div class="stat-icon">
                     <i class="fas fa-comments"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="stat-total-conversations">0</h3>
+                    <h3 class="stat-skeleton" id="stat-total-conversations">
+                        <div class="skeleton-loader skeleton-loader-wide"></div>
+                    </h3>
                     <p>Total Conversations</p>
                 </div>
             </div>
-            
+
             <div class="stat-card purple">
                 <div class="stat-icon">
                     <i class="fas fa-envelope"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="stat-total-messages">0</h3>
+                    <h3 class="stat-skeleton" id="stat-total-messages">
+                        <div class="skeleton-loader skeleton-loader-wide"></div>
+                    </h3>
                     <p>Total Messages</p>
                 </div>
             </div>
-            
+
             <div class="stat-card orange">
                 <div class="stat-icon">
                     <i class="fas fa-chart-line"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="stat-avg-messages">0</h3>
+                    <h3 class="stat-skeleton" id="stat-avg-messages">
+                        <div class="skeleton-loader skeleton-loader-wide"></div>
+                    </h3>
                     <p>Moy. Messages/User</p>
                 </div>
             </div>
@@ -218,13 +227,25 @@ $adminName = getAdminName();
             try {
                 const response = await fetch('<?= apiUrl('users-management', ['action' => 'stats']) ?>');
                 const result = await response.json();
-                
+
                 if (result.success) {
                     const stats = result.data;
-                    document.getElementById('stat-total-users').textContent = adminUtils.formatNumber(stats.total_users);
-                    document.getElementById('stat-total-conversations').textContent = adminUtils.formatNumber(stats.total_conversations);
-                    document.getElementById('stat-total-messages').textContent = adminUtils.formatNumber(stats.total_messages);
-                    document.getElementById('stat-avg-messages').textContent = stats.avg_messages_per_user;
+
+                    const statTotalUsers = document.getElementById('stat-total-users');
+                    statTotalUsers.textContent = adminUtils.formatNumber(stats.total_users);
+                    statTotalUsers.classList.add('loaded');
+
+                    const statTotalConversations = document.getElementById('stat-total-conversations');
+                    statTotalConversations.textContent = adminUtils.formatNumber(stats.total_conversations);
+                    statTotalConversations.classList.add('loaded');
+
+                    const statTotalMessages = document.getElementById('stat-total-messages');
+                    statTotalMessages.textContent = adminUtils.formatNumber(stats.total_messages);
+                    statTotalMessages.classList.add('loaded');
+
+                    const statAvgMessages = document.getElementById('stat-avg-messages');
+                    statAvgMessages.textContent = stats.avg_messages_per_user;
+                    statAvgMessages.classList.add('loaded');
                 }
             } catch (error) {
                 console.error('Erreur stats:', error);
