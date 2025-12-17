@@ -357,12 +357,30 @@ body {
 }
 
 .btn-danger {
-    background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #ff6b6b, #fa5252);
+    color: white;
     border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
 }
 
 .btn-danger:hover {
+    transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+    background: linear-gradient(135deg, #fa5252, #ff6b6b);
+}
+
+.btn-danger:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
 }
 
 /* ========================================
