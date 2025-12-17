@@ -49,35 +49,32 @@ try {
     // 1. STATISTIQUES GLOBALES
     // ============================================
 
-    // Total utilisateurs uniques (TOUS les utilisateurs WhatsApp, pas seulement la période)
+    // Total utilisateurs uniques (TOUS les utilisateurs WhatsApp)
     $stmtUsers = $db->query("
         SELECT COUNT(DISTINCT wa_id) as total
         FROM public.conversations
     ");
     $totalUsers = (int)$stmtUsers->fetch(PDO::FETCH_ASSOC)['total'];
-    
-    // Total conversations
+
+    // Total conversations (TOUTES les conversations)
     $stmtConv = $db->query("
         SELECT COUNT(*) as total
         FROM public.conversations
-        WHERE started_at >= '{$dateLimit}'
     ");
     $totalConversations = (int)$stmtConv->fetch(PDO::FETCH_ASSOC)['total'];
-    
-    // Total messages
+
+    // Total messages (TOUS les messages)
     $stmtMsg = $db->query("
         SELECT COUNT(*) as total
         FROM public.messages
-        WHERE sent_at >= '{$dateLimit}'
     ");
     $totalMessages = (int)$stmtMsg->fetch(PDO::FETCH_ASSOC)['total'];
-    
-    // Urgences critiques
+
+    // Urgences critiques (TOUTES)
     $stmtUrg = $db->query("
         SELECT COUNT(*) as total
         FROM public.conversations
         WHERE current_urgency_level >= 4
-        AND started_at >= '{$dateLimit}'
     ");
     $totalUrgencies = (int)$stmtUrg->fetch(PDO::FETCH_ASSOC)['total'];
     

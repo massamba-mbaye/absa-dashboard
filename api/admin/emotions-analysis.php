@@ -79,57 +79,47 @@ try {
     switch ($action) {
         
         case 'overview':
-            // 1. Statistiques globales
-            $stmtTotalAnalyses = $db->prepare("
+            // 1. Statistiques globales (TOUTES, pas seulement la période)
+            $stmtTotalAnalyses = $db->query("
                 SELECT COUNT(*) as total
                 FROM public.messages
                 WHERE urgency_analysis IS NOT NULL
-                AND sent_at >= :date_limit
             ");
-            $stmtTotalAnalyses->execute(['date_limit' => $dateLimit]);
             $totalAnalyses = (int)$stmtTotalAnalyses->fetch(PDO::FETCH_ASSOC)['total'];
-            
-            $stmtAvgUrgency = $db->prepare("
+
+            $stmtAvgUrgency = $db->query("
                 SELECT AVG(current_urgency_level) as avg_urgency
                 FROM public.conversations
                 WHERE current_urgency_level > 0
-                AND started_at >= :date_limit
             ");
-            $stmtAvgUrgency->execute(['date_limit' => $dateLimit]);
             $avgUrgency = $stmtAvgUrgency->fetch(PDO::FETCH_ASSOC)['avg_urgency'];
             $avgUrgency = $avgUrgency ? round((float)$avgUrgency, 2) : 0;
             
-            $stmtUrgentCases = $db->prepare("
+            $stmtUrgentCases = $db->query("
                 SELECT COUNT(*) as total
                 FROM public.conversations
                 WHERE current_urgency_level >= 4
-                AND started_at >= :date_limit
             ");
-            $stmtUrgentCases->execute(['date_limit' => $dateLimit]);
             $urgentCases = (int)$stmtUrgentCases->fetch(PDO::FETCH_ASSOC)['total'];
-            
-            $stmtViolence = $db->prepare("
+
+            $stmtViolence = $db->query("
                 SELECT COUNT(*) as total
                 FROM public.messages
                 WHERE urgency_analysis->>'violence_type' IS NOT NULL
                 AND urgency_analysis->>'violence_type' != ''
-                AND sent_at >= :date_limit
             ");
-            $stmtViolence->execute(['date_limit' => $dateLimit]);
             $violenceReported = (int)$stmtViolence->fetch(PDO::FETCH_ASSOC)['total'];
-            
-            // 2. Distribution des sentiments
-            $stmtSentiments = $db->prepare("
-                SELECT 
+
+            // 2. Distribution des sentiments (TOUS)
+            $stmtSentiments = $db->query("
+                SELECT
                     urgency_analysis->>'sentiment' as sentiment,
                     COUNT(*) as count
                 FROM public.messages
                 WHERE urgency_analysis IS NOT NULL
                 AND urgency_analysis->>'sentiment' IS NOT NULL
-                AND sent_at >= :date_limit
                 GROUP BY urgency_analysis->>'sentiment'
             ");
-            $stmtSentiments->execute(['date_limit' => $dateLimit]);
             
             $sentiments = ['positive' => 0, 'neutral' => 0, 'negative' => 0];
             
@@ -161,22 +151,20 @@ try {
                 'negative' => $sentiments['negative']
             ];
             
-            // 3. Top 10 émotions
-            $stmtEmotions = $db->prepare("
-                SELECT 
+            // 3. Top 10 émotions (TOUTES)
+            $stmtEmotions = $db->query("
+                SELECT
                     urgency_analysis->>'emotion' as emotion,
                     COUNT(*) as count
                 FROM public.messages
                 WHERE urgency_analysis IS NOT NULL
                 AND urgency_analysis->>'emotion' IS NOT NULL
                 AND urgency_analysis->>'emotion' != ''
-                AND sent_at >= :date_limit
                 GROUP BY urgency_analysis->>'emotion'
                 ORDER BY count DESC
                 LIMIT 10
             ");
-            $stmtEmotions->execute(['date_limit' => $dateLimit]);
-            
+
             $topEmotions = [];
             while ($row = $stmtEmotions->fetch(PDO::FETCH_ASSOC)) {
                 if ($row['emotion']) {
@@ -188,19 +176,17 @@ try {
                     ];
                 }
             }
-            
-            // 4. Distribution des niveaux d'urgence
-            $stmtUrgencyDist = $db->prepare("
-                SELECT 
+
+            // 4. Distribution des niveaux d'urgence (TOUTES)
+            $stmtUrgencyDist = $db->query("
+                SELECT
                     current_urgency_level as level,
                     COUNT(*) as count
                 FROM public.conversations
                 WHERE current_urgency_level > 0
-                AND started_at >= :date_limit
                 GROUP BY current_urgency_level
                 ORDER BY current_urgency_level ASC
             ");
-            $stmtUrgencyDist->execute(['date_limit' => $dateLimit]);
             
             $urgencyDistribution = [];
             for ($i = 1; $i <= 5; $i++) {
@@ -256,20 +242,18 @@ try {
             }
             
             // 6. Types de violences
-            $stmtViolenceTypes = $db->prepare("
-                SELECT 
+            $stmtViolenceTypes = $db->query("
+                SELECT
                     urgency_analysis->>'violence_type' as violence_type,
                     COUNT(*) as count
                 FROM public.messages
                 WHERE urgency_analysis IS NOT NULL
                 AND urgency_analysis->>'violence_type' IS NOT NULL
                 AND urgency_analysis->>'violence_type' != ''
-                AND sent_at >= :date_limit
                 GROUP BY urgency_analysis->>'violence_type'
                 ORDER BY count DESC
             ");
-            $stmtViolenceTypes->execute(['date_limit' => $dateLimit]);
-            
+
             $violenceTypes = [];
             while ($row = $stmtViolenceTypes->fetch(PDO::FETCH_ASSOC)) {
                 if ($row['violence_type']) {
@@ -279,10 +263,10 @@ try {
                     ];
                 }
             }
-            
-            // 7. Émotions par sentiment
-            $stmtEmotionsBySentiment = $db->prepare("
-                SELECT 
+
+            // 7. Émotions par sentiment (TOUTES)
+            $stmtEmotionsBySentiment = $db->query("
+                SELECT
                     urgency_analysis->>'sentiment' as sentiment,
                     urgency_analysis->>'emotion' as emotion,
                     COUNT(*) as count
@@ -291,13 +275,11 @@ try {
                 AND urgency_analysis->>'sentiment' IS NOT NULL
                 AND urgency_analysis->>'emotion' IS NOT NULL
                 AND urgency_analysis->>'emotion' != ''
-                AND sent_at >= :date_limit
-                GROUP BY 
+                GROUP BY
                     urgency_analysis->>'sentiment',
                     urgency_analysis->>'emotion'
                 ORDER BY count DESC
             ");
-            $stmtEmotionsBySentiment->execute(['date_limit' => $dateLimit]);
             
             $emotionsBySentiment = [
                 'positive' => [],
