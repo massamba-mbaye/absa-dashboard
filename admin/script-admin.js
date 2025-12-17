@@ -439,8 +439,17 @@ function showModal(title, content, buttons = []) {
     
     // Body
     const body = document.createElement('div');
-    body.style.cssText = 'padding: 25px; color: #e5e7eb;';
+    body.style.cssText = 'padding: 25px; color: #e5e7eb !important;';
     body.innerHTML = content;
+
+    // Forcer la couleur sur tous les éléments de texte
+    setTimeout(() => {
+        body.querySelectorAll('p, span, div, strong, h4, h3').forEach(el => {
+            if (!el.style.color || el.style.color === '') {
+                el.style.color = '#e5e7eb';
+            }
+        });
+    }, 10);
     
     // Footer avec boutons
     const footer = document.createElement('div');
