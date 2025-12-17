@@ -248,15 +248,29 @@ $adminName = getAdminName();
                 }
                 
                 const data = result.data;
-                
+
+                console.log('Données reçues:', data);
+                console.log('sentiment_evolution:', data.sentiment_evolution);
+
                 // Afficher les statistiques
                 displayStats(data.global_stats);
-                
+
                 // Créer/Mettre à jour les graphiques
                 createSentimentsChart(data.sentiment_distribution);
                 createEmotionsChart(data.top_emotions);
                 createUrgencyChart(data.urgency_distribution);
-                createEvolutionChart(data.sentiment_evolution);
+
+                if (data.sentiment_evolution && data.sentiment_evolution.length > 0) {
+                    console.log('Création du graphique évolution avec', data.sentiment_evolution.length, 'jours');
+                    createEvolutionChart(data.sentiment_evolution);
+                } else {
+                    console.warn('Aucune donnée d\'évolution disponible');
+                    // Afficher un message dans le graphique
+                    const evolutionContainer = document.getElementById('evolution-chart').parentElement;
+                    if (evolutionContainer) {
+                        evolutionContainer.innerHTML = '<p style="text-align: center; color: #9ca3af; padding: 40px;">Aucune donnée disponible pour la période sélectionnée</p>';
+                    }
+                }
                 
                 // Afficher les types de violence
                 displayViolenceTypes(data.violence_types);
