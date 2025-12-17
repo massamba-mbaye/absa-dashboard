@@ -116,23 +116,21 @@ try {
     }
     
     // ============================================
-    // 3. TOP 5 ÉMOTIONS
+    // 3. TOP 5 ÉMOTIONS (TOUTES)
     // ============================================
-    
-    $stmtEmotions = $db->prepare("
-        SELECT 
+
+    $stmtEmotions = $db->query("
+        SELECT
             urgency_analysis->>'emotion' as emotion,
             COUNT(*) as count
         FROM public.messages
         WHERE urgency_analysis IS NOT NULL
         AND urgency_analysis->>'emotion' IS NOT NULL
         AND urgency_analysis->>'emotion' != ''
-        AND sent_at >= :date_limit
         GROUP BY urgency_analysis->>'emotion'
         ORDER BY count DESC
         LIMIT 5
     ");
-    $stmtEmotions->execute(['date_limit' => $dateLimit]);
     
     $topEmotions = [];
     $emojis = [
@@ -157,22 +155,20 @@ try {
     }
     
     // ============================================
-    // 4. TYPES DE VIOLENCES
+    // 4. TYPES DE VIOLENCES (TOUTES)
     // ============================================
-    
-    $stmtViolence = $db->prepare("
-        SELECT 
+
+    $stmtViolence = $db->query("
+        SELECT
             urgency_analysis->>'violence_type' as violence_type,
             COUNT(*) as count
         FROM public.messages
         WHERE urgency_analysis IS NOT NULL
         AND urgency_analysis->>'violence_type' IS NOT NULL
         AND urgency_analysis->>'violence_type' != ''
-        AND sent_at >= :date_limit
         GROUP BY urgency_analysis->>'violence_type'
         ORDER BY count DESC
     ");
-    $stmtViolence->execute(['date_limit' => $dateLimit]);
     
     $violenceTypes = [];
     while ($row = $stmtViolence->fetch(PDO::FETCH_ASSOC)) {
@@ -259,17 +255,15 @@ try {
     // 6. STATS SUPPLÉMENTAIRES
     // ============================================
     
-    $stmtSentRate = $db->prepare("
-        SELECT 
+    $stmtSentRate = $db->query("
+        SELECT
             urgency_analysis->>'sentiment' as sentiment,
             COUNT(*) as count
         FROM public.messages
         WHERE urgency_analysis IS NOT NULL
         AND urgency_analysis->>'sentiment' IS NOT NULL
-        AND sent_at >= :date_limit
         GROUP BY urgency_analysis->>'sentiment'
     ");
-    $stmtSentRate->execute(['date_limit' => $dateLimit]);
     
     $sentimentCounts = ['positive' => 0, 'neutral' => 0, 'negative' => 0];
     
@@ -285,15 +279,13 @@ try {
         ? round(($sentimentCounts['positive'] / $totalSent) * 100, 1)
         : 0;
     
-    // Moyenne urgence
-    $stmtAvgUrg = $db->prepare("
+    // Moyenne urgence (TOUTES)
+    $stmtAvgUrg = $db->query("
         SELECT AVG(current_urgency_level) as avg_urgency
         FROM public.conversations
         WHERE current_urgency_level IS NOT NULL
         AND current_urgency_level > 0
-        AND started_at >= :date_limit
     ");
-    $stmtAvgUrg->execute(['date_limit' => $dateLimit]);
     $avgUrgency = $stmtAvgUrg->fetch(PDO::FETCH_ASSOC)['avg_urgency'];
     $avgUrgency = $avgUrgency ? round((float)$avgUrgency, 2) : 0;
     

@@ -354,9 +354,9 @@ $adminName = getAdminName();
                         <td>${adminUtils.formatRelativeDate(user.first_seen)}</td>
                         <td>${adminUtils.formatRelativeDate(user.last_activity)}</td>
                         <td>
-                            <button class="btn-action" onclick="viewUserDetails('${user.user_id}')" title="Voir les détails">
+                            <a href="user-details.php?wa_id=${encodeURIComponent(user.user_id)}" class="btn-action" title="Voir les détails">
                                 <i class="fas fa-eye"></i>
-                            </button>
+                            </a>
                             <button class="btn-icon" onclick="copyUUID('${user.user_id}')" title="Copier UUID">
                                 <i class="fas fa-copy"></i>
                             </button>

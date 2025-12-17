@@ -437,7 +437,135 @@ try {
                 'exported_at' => date('Y-m-d H:i:s')
             ]);
             break;
-        
+
+        case 'user_details':
+            $waId = $_GET['wa_id'] ?? null;
+
+            if (!$waId) {
+                jsonError('Paramètre wa_id requis', 400);
+            }
+
+            // Vérifier si l'utilisateur existe
+            $stmtExists = $db->prepare("
+                SELECT COUNT(*) as count
+                FROM public.conversations
+                WHERE wa_id = :wa_id
+            ");
+            $stmtExists->execute(['wa_id' => $waId]);
+
+            if ((int)$stmtExists->fetch(PDO::FETCH_ASSOC)['count'] === 0) {
+                jsonError('Utilisateur introuvable', 404);
+            }
+
+            // Statistiques utilisateur
+            $stmtStats = $db->prepare("
+                SELECT
+                    COUNT(DISTINCT c.id) as total_conversations,
+                    SUM(c.message_count) as total_messages,
+                    MAX(c.current_urgency_level) as max_urgency
+                FROM public.conversations c
+                WHERE c.wa_id = :wa_id
+            ");
+            $stmtStats->execute(['wa_id' => $waId]);
+            $stats = $stmtStats->fetch(PDO::FETCH_ASSOC);
+
+            // Sentiment dominant
+            $stmtSentiment = $db->prepare("
+                SELECT
+                    m.urgency_analysis->>'sentiment' as sentiment,
+                    COUNT(*) as count
+                FROM public.messages m
+                JOIN public.conversations c ON m.conversation_id = c.id
+                WHERE c.wa_id = :wa_id
+                AND m.urgency_analysis IS NOT NULL
+                AND m.urgency_analysis->>'sentiment' IS NOT NULL
+                GROUP BY m.urgency_analysis->>'sentiment'
+                ORDER BY count DESC
+                LIMIT 1
+            ");
+            $stmtSentiment->execute(['wa_id' => $waId]);
+            $sentimentRow = $stmtSentiment->fetch(PDO::FETCH_ASSOC);
+            $dominantSentiment = $sentimentRow ? ucfirst($sentimentRow['sentiment']) : '-';
+
+            // Liste des conversations
+            $stmtConversations = $db->prepare("
+                SELECT
+                    c.id,
+                    c.started_at,
+                    c.last_message_at as updated_at,
+                    c.message_count,
+                    c.current_urgency_level as urgency
+                FROM public.conversations c
+                WHERE c.wa_id = :wa_id
+                ORDER BY c.last_message_at DESC
+            ");
+            $stmtConversations->execute(['wa_id' => $waId]);
+
+            $conversations = [];
+            while ($conv = $stmtConversations->fetch(PDO::FETCH_ASSOC)) {
+                $convId = $conv['id'];
+
+                // Récupérer le dernier message user pour le titre et le sentiment
+                $stmtLastMsg = $db->prepare("
+                    SELECT
+                        content,
+                        urgency_analysis
+                    FROM public.messages
+                    WHERE conversation_id = :conv_id
+                    AND sender = 'user'
+                    ORDER BY sent_at DESC
+                    LIMIT 1
+                ");
+                $stmtLastMsg->execute(['conv_id' => $convId]);
+                $lastMsg = $stmtLastMsg->fetch(PDO::FETCH_ASSOC);
+
+                $title = "Conversation #" . $convId;
+                $sentiment = null;
+
+                if ($lastMsg) {
+                    // Titre depuis le contenu
+                    if (!empty($lastMsg['content'])) {
+                        $preview = substr($lastMsg['content'], 0, 50);
+                        if (strlen($lastMsg['content']) > 50) {
+                            $preview .= '...';
+                        }
+                        $title = $preview;
+                    }
+
+                    // Sentiment
+                    if ($lastMsg['urgency_analysis']) {
+                        $urgencyData = json_decode($lastMsg['urgency_analysis'], true);
+                        if ($urgencyData && isset($urgencyData['sentiment'])) {
+                            $sentiment = $urgencyData['sentiment'];
+                        }
+                    }
+                }
+
+                $conversations[] = [
+                    'id' => (int)$convId,
+                    'title' => $title,
+                    'message_count' => (int)$conv['message_count'],
+                    'sentiment' => $sentiment,
+                    'urgency' => $conv['urgency'] ? (int)$conv['urgency'] : 0,
+                    'created_at' => $conv['started_at'],
+                    'updated_at' => $conv['updated_at']
+                ];
+            }
+
+            logAdminActivity('view_user_details', ['wa_id' => $waId]);
+
+            jsonSuccess([
+                'wa_id' => $waId,
+                'stats' => [
+                    'total_conversations' => (int)$stats['total_conversations'],
+                    'total_messages' => (int)$stats['total_messages'],
+                    'max_urgency' => $stats['max_urgency'] ? (int)$stats['max_urgency'] : 0,
+                    'dominant_sentiment' => $dominantSentiment
+                ],
+                'conversations' => $conversations
+            ]);
+            break;
+
         default:
             jsonError('Action inconnue: ' . $action, 400);
     }
