@@ -220,7 +220,7 @@ $adminName = getAdminName();
         // VARIABLES GLOBALES
         // ============================================
         
-        let currentPeriod = 7;
+        let currentPeriod = 30;
         let charts = {
             sentiments: null,
             emotions: null,

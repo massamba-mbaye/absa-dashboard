@@ -67,41 +67,6 @@ function showSessionExpiredModal() {
     );
 }
 
-/**
- * Affiche un warning que la session va expirer
- */
-function showSessionWarning(timeRemaining) {
-    const minutes = Math.ceil(timeRemaining / 60);
-    
-    showNotification(
-        `⚠️ Votre session expire dans ${minutes} minutes`,
-        'warning',
-        5000
-    );
-}
-
-/**
- * Prolonge la session
- */
-async function refreshSession() {
-    try {
-        const response = await fetch(
-            ADMIN_CONFIG.API_BASE + 'auth.php?action=refresh-session',
-            { method: 'POST' }
-        );
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showNotification('✅ Session prolongée', 'success');
-            return true;
-        }
-    } catch (error) {
-        console.error('Erreur prolongation session:', error);
-    }
-    return false;
-}
-
 // ============================================
 // NAVIGATION MOBILE
 // ============================================
@@ -643,26 +608,6 @@ function truncateText(text, maxLength = 50) {
     return text.substring(0, maxLength) + '...';
 }
 
-/**
- * Formate une durée en format lisible
- * 
- * @param {number} seconds - Secondes
- * @returns {string} Format "Xh Ym Zs"
- */
-function formatDuration(seconds) {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    
-    if (hours > 0) {
-        return `${hours}h ${minutes}m`;
-    }
-    if (minutes > 0) {
-        return `${minutes}m ${secs}s`;
-    }
-    return `${secs}s`;
-}
-
 // ============================================
 // COPIER DANS LE PRESSE-PAPIER
 // ============================================
@@ -880,14 +825,12 @@ window.adminUtils = {
     confirmAction,
     formatRelativeDate,
     formatNumber,
-    formatDuration,
     truncateText,
     copyToClipboard,
     exportToCSV,
     debounce,
     showLoader,
     hideLoader,
-    refreshSession,
     logout
 };
 
