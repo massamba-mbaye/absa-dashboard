@@ -314,11 +314,12 @@ try {
             }
             
             // Vérifier qu'il reste au moins un admin actif
-            $stmtCount = $db->query("
-                SELECT COUNT(*) as count 
-                FROM public.users 
-                WHERE role = 'admin' AND is_active = true AND id != $userId
+            $stmtCount = $db->prepare("
+                SELECT COUNT(*) as count
+                FROM public.users
+                WHERE role = 'admin' AND is_active = true AND id != :user_id
             ");
+            $stmtCount->execute(['user_id' => $userId]);
             $adminCount = $stmtCount->fetch(PDO::FETCH_ASSOC)['count'];
             
             if ($adminCount == 0) {
