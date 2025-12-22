@@ -38,8 +38,22 @@
 
     <div class="sidebar-footer">
         <div class="admin-info">
-            <i class="fas fa-user-circle"></i>
-            <span><?= htmlspecialchars($adminName ?? 'Admin') ?></span>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <i class="fas fa-user-circle" style="font-size: 32px; color: #4b3795;"></i>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-weight: 600; color: #e5e7eb; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <?= htmlspecialchars($adminName ?? 'Admin') ?>
+                    </div>
+                    <?php
+                    $role = $adminRole ?? 'viewer';
+                    $roleLabel = $role === 'admin' ? 'Administrateur' : 'Observateur';
+                    $roleColor = $role === 'admin' ? '#4b3795' : '#51c6e1';
+                    ?>
+                    <div style="display: inline-block; background: <?= $roleColor ?>20; color: <?= $roleColor ?>; border: 1px solid <?= $roleColor ?>; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-top: 4px;">
+                        <?= $roleLabel ?>
+                    </div>
+                </div>
+            </div>
         </div>
         <button class="btn-logout" onclick="logout()">
             <i class="fas fa-sign-out-alt"></i>

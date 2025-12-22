@@ -87,7 +87,7 @@ $isAdmin = isAdmin();
                     <h3 class="stat-skeleton" id="stat-viewers">
                         <div class="skeleton-loader"></div>
                     </h3>
-                    <p>Lecture Seule</p>
+                    <p>Observateurs</p>
                 </div>
             </div>
 

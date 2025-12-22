@@ -70,7 +70,7 @@ try {
                     'last_name' => $row['last_name'],
                     'full_name' => trim($row['first_name'] . ' ' . $row['last_name']),
                     'role' => $row['role'],
-                    'role_label' => $row['role'] === 'admin' ? 'Administrateur' : 'Lecture seule',
+                    'role_label' => $row['role'] === 'admin' ? 'Administrateur' : 'Observateur',
                     'is_active' => (bool)$row['is_active'],
                     'created_at' => $row['created_at'],
                     'last_login' => $row['last_login'],
