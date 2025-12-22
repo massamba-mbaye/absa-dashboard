@@ -25,7 +25,7 @@ header("Content-Security-Policy: " .
     "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; " .
     "font-src 'self' https://cdnjs.cloudflare.com; " .
     "img-src 'self' data: https:; " .
-    "connect-src 'self'; " .
+    "connect-src 'self' https://cdn.jsdelivr.net; " .
     "frame-ancestors 'none';"
 );
 
