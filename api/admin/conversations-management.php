@@ -334,6 +334,7 @@ try {
         case 'delete':
             // Seuls les admins peuvent supprimer des conversations
             requireRole('admin');
+            requireCSRFToken();
 
             if ($_SERVER['REQUEST_METHOD'] !== 'DELETE' && $_SERVER['REQUEST_METHOD'] !== 'POST') {
                 jsonError('Méthode non autorisée', 405);
@@ -450,6 +451,7 @@ try {
         case 'export':
             // Seuls les admins peuvent exporter les données
             requireRole('admin');
+            requireCSRFToken();
 
             $query = "
                 SELECT 

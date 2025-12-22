@@ -4,6 +4,9 @@
  * Vérification des sessions et protection des pages
  */
 
+// Charger les headers de sécurité
+require_once __DIR__ . '/security-headers.php';
+
 // Démarrer la session si pas déjà démarrée
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -391,7 +394,7 @@ function generateCSRFToken() {
 
 /**
  * Vérifie un token CSRF
- * 
+ *
  * @param string $token Token à vérifier
  * @return bool True si valide
  */
@@ -399,13 +402,63 @@ function verifyCSRFToken($token) {
     if (!isset($_SESSION['csrf_token'])) {
         return false;
     }
-    
+
     return hash_equals($_SESSION['csrf_token'], $token);
 }
 
 /**
+ * Vérifie le token CSRF pour les requêtes API
+ * Bloque la requête si le token est invalide
+ *
+ * @return void
+ * @throws Exit si token invalide
+ */
+function requireCSRFToken() {
+    // Vérifier si c'est une méthode qui nécessite CSRF
+    $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    if (!in_array($method, ['POST', 'PUT', 'DELETE', 'PATCH'])) {
+        return; // GET et HEAD ne nécessitent pas CSRF
+    }
+
+    // Récupérer le token depuis les headers ou le body
+    $token = null;
+
+    // 1. Vérifier dans les headers (X-CSRF-Token)
+    if (isset($_SERVER['HTTP_X_CSRF_TOKEN'])) {
+        $token = $_SERVER['HTTP_X_CSRF_TOKEN'];
+    }
+    // 2. Vérifier dans le body JSON
+    elseif (!empty($_POST['csrf_token'])) {
+        $token = $_POST['csrf_token'];
+    }
+    // 3. Vérifier dans le body JSON pour les requêtes application/json
+    else {
+        $input = file_get_contents('php://input');
+        if ($input) {
+            $data = json_decode($input, true);
+            if (isset($data['csrf_token'])) {
+                $token = $data['csrf_token'];
+            }
+        }
+    }
+
+    // Vérifier le token
+    if (!$token || !verifyCSRFToken($token)) {
+        error_log("⚠️ CSRF token invalide ou manquant - IP: " . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+
+        http_response_code(403);
+        echo json_encode([
+            'success' => false,
+            'error' => 'Token CSRF invalide ou manquant',
+            'code' => 'CSRF_TOKEN_INVALID'
+        ]);
+        exit;
+    }
+}
+
+/**
  * Retourne le champ input HTML pour le token CSRF
- * 
+ *
  * @return string HTML input
  */
 function csrfField() {

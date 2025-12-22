@@ -403,6 +403,7 @@ try {
         case 'export':
             // Seuls les admins peuvent exporter les données
             requireRole('admin');
+            requireCSRFToken();
 
             $query = "
                 SELECT 

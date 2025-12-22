@@ -127,6 +127,7 @@ try {
         case 'create':
             // Seuls les admins peuvent créer des utilisateurs
             requireRole('admin');
+            requireCSRFToken();
 
             $email = trim($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
@@ -187,6 +188,7 @@ try {
         case 'update':
             // Seuls les admins peuvent modifier des utilisateurs
             requireRole('admin');
+            requireCSRFToken();
 
             $userId = (int)($_POST['id'] ?? 0);
             if (!$userId) jsonError('ID utilisateur manquant');
@@ -241,6 +243,7 @@ try {
         case 'reset_password':
             // Vérifier les permissions
             requireRole('admin');
+            requireCSRFToken();
 
             $userId = (int)($_POST['id'] ?? 0);
             $newPassword = $_POST['new_password'] ?? '';
@@ -273,6 +276,7 @@ try {
         case 'toggle_status':
             // Vérifier les permissions
             requireRole('admin');
+            requireCSRFToken();
 
             $userId = (int)($_POST['id'] ?? 0);
             if (!$userId) jsonError('ID utilisateur manquant');
@@ -305,6 +309,7 @@ try {
         case 'delete':
             // Vérifier les permissions
             requireRole('admin');
+            requireCSRFToken();
 
             $userId = (int)($_POST['id'] ?? 0);
             if (!$userId) jsonError('ID utilisateur manquant');

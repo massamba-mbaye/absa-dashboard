@@ -145,12 +145,43 @@ window.addEventListener('DOMContentLoaded', initMobileMenu);
 window.addEventListener('resize', initMobileMenu);
 
 // ============================================
+// CSRF TOKEN MANAGEMENT
+// ============================================
+
+let csrfToken = null;
+
+/**
+ * Récupère le token CSRF depuis le serveur
+ * @returns {Promise<string>} Token CSRF
+ */
+async function getCSRFToken() {
+    if (csrfToken) {
+        return csrfToken;
+    }
+
+    try {
+        const response = await fetch(ADMIN_CONFIG.API_BASE + 'auth.php?action=get-csrf-token');
+        const data = await response.json();
+
+        if (data.success && data.data.csrf_token) {
+            csrfToken = data.data.csrf_token;
+            return csrfToken;
+        }
+
+        throw new Error('Impossible de récupérer le token CSRF');
+    } catch (error) {
+        console.error('Erreur CSRF:', error);
+        return null;
+    }
+}
+
+// ============================================
 // REQUÊTES API
 // ============================================
 
 /**
  * Effectue une requête API sécurisée avec gestion d'erreurs
- * 
+ *
  * @param {string} endpoint - Endpoint API (ex: 'stats.php')
  * @param {object} options - Options fetch (method, body, etc.)
  * @returns {Promise<object>} Réponse JSON
@@ -158,29 +189,50 @@ window.addEventListener('resize', initMobileMenu);
 async function apiRequest(endpoint, options = {}) {
     try {
         const url = ADMIN_CONFIG.API_BASE + endpoint;
-        
+        const method = options.method || 'GET';
+
+        // Ajouter le token CSRF pour les requêtes POST/PUT/DELETE
+        const headers = {
+            'Content-Type': 'application/json',
+            ...options.headers
+        };
+
+        if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method.toUpperCase())) {
+            const token = await getCSRFToken();
+            if (token) {
+                headers['X-CSRF-Token'] = token;
+            }
+        }
+
         const response = await fetch(url, {
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            },
+            headers,
             ...options
         });
-        
+
         // Redirection si non authentifié
         if (response.status === 401) {
             window.location.href = 'index.php?error=session_expired';
             return null;
         }
-        
+
+        // Si le token CSRF est invalide, le récupérer à nouveau
+        if (response.status === 403) {
+            const data = await response.json();
+            if (data.code === 'CSRF_TOKEN_INVALID') {
+                csrfToken = null; // Réinitialiser le token
+                // Réessayer la requête une fois
+                return apiRequest(endpoint, options);
+            }
+        }
+
         const data = await response.json();
-        
+
         if (!response.ok) {
             throw new Error(data.error || `Erreur HTTP: ${response.status}`);
         }
-        
+
         return data;
-        
+
     } catch (error) {
         console.error('Erreur API:', error);
         showNotification('❌ Erreur: ' + error.message, 'error');
@@ -815,13 +867,12 @@ function hideLoader() {
  */
 async function logout() {
     try {
-        const response = await fetch(ADMIN_CONFIG.API_BASE + 'auth.php?action=logout', {
+        // Utiliser apiRequest pour gérer automatiquement le CSRF token
+        const data = await apiRequest('auth.php?action=logout', {
             method: 'POST'
         });
 
-        const data = await response.json();
-
-        if (data.success) {
+        if (data && data.success) {
             window.location.href = 'index.php';
         }
     } catch (error) {

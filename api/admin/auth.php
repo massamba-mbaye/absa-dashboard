@@ -75,7 +75,11 @@ switch ($action) {
     case 'refresh-session':
         handleRefreshSession();
         break;
-        
+
+    case 'get-csrf-token':
+        handleGetCSRFToken();
+        break;
+
     default:
         jsonError('Action invalide: ' . $action, 400);
 }
@@ -156,18 +160,20 @@ function handleLogin() {
 // ============================================
 
 function handleLogout() {
+    requireCSRFToken();
+
     if (isAdminLoggedIn()) {
         $admin = getCurrentAdmin();
-        
+
         logAdminActivity('logout', [
             'username' => $admin['username']
         ]);
-        
+
         error_log("🚪 Déconnexion de: " . $admin['username']);
     }
-    
+
     logoutAdmin();
-    
+
     jsonSuccess([], 'Déconnexion réussie');
 }
 
@@ -205,20 +211,35 @@ function handleCheckSession() {
 // ============================================
 
 function handleRefreshSession() {
+    requireCSRFToken();
+
     if (!isAdminLoggedIn()) {
         jsonError('Session expirée', 401);
     }
-    
+
     // Prolonger la session
     $_SESSION['login_time'] = time();
     $_SESSION['last_activity'] = time();
-    
+
     logAdminActivity('session_refresh');
-    
+
     jsonSuccess([
         'new_expires_at' => date('Y-m-d H:i:s', time() + SESSION_LIFETIME),
         'time_remaining' => SESSION_LIFETIME
     ], 'Session prolongée');
+}
+
+// ============================================
+// HANDLER: GET CSRF TOKEN
+// ============================================
+
+function handleGetCSRFToken() {
+    // Générer ou récupérer le token CSRF
+    $token = generateCSRFToken();
+
+    jsonSuccess([
+        'csrf_token' => $token
+    ]);
 }
 
 // ============================================
