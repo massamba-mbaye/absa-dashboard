@@ -351,18 +351,24 @@ $adminName = getAdminName();
                     urgencyBadge = '<span style="color: #6b7280;">-</span>';
                 }
                 
-                // Violence
-                const violence = conv.violence_type 
-                    ? `<span class="badge danger">${conv.violence_type}</span>`
+                // Violence (échappé pour prévenir XSS)
+                const violence = conv.violence_type
+                    ? `<span class="badge danger">${adminUtils.escapeHtml(conv.violence_type)}</span>`
+                    : '<span style="color: #6b7280;">-</span>';
+
+                // Émotion (échappé pour prévenir XSS)
+                const emotion = conv.emotion
+                    ? adminUtils.escapeHtml(conv.emotion)
                     : '<span style="color: #6b7280;">-</span>';
                 
-                // Émotion
-                const emotion = conv.emotion || '<span style="color: #6b7280;">-</span>';
-                
+                // Échapper le titre pour prévenir les attaques XSS
+                const escapedTitle = adminUtils.escapeHtml(conv.title);
+                const truncatedTitle = adminUtils.truncateText(escapedTitle, 40);
+
                 html += `
                     <tr>
                         <td><strong>#${conv.id}</strong></td>
-                        <td class="text-truncate" title="${conv.title}">${adminUtils.truncateText(conv.title, 40)}</td>
+                        <td class="text-truncate" title="${escapedTitle}">${truncatedTitle}</td>
                         <td>
                             <span class="uuid-short" title="${conv.user_id}">${conv.user_id_short}</span>
                         </td>
@@ -376,7 +382,7 @@ $adminName = getAdminName();
                             <a href="conversation-details.php?id=${conv.id}" class="btn-action" title="Voir la timeline">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <button class="btn-icon" style="color: #ff6b6b;" onclick="deleteConversation(${conv.id}, '${conv.title.replace(/'/g, "\\'")}')" title="Supprimer">
+                            <button class="btn-icon" style="color: #ff6b6b;" onclick="deleteConversation(${conv.id}, '${escapedTitle.replace(/'/g, "\\'")}')" title="Supprimer">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>

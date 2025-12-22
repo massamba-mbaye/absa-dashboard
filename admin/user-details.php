@@ -253,10 +253,13 @@ $adminName = getAdminName();
                     urgencyBadge = `<span class="badge" style="background: ${urgColor}20; color: ${urgColor}; border: 1px solid ${urgColor};">Niveau ${conv.urgency}</span>`;
                 }
 
+                // Échapper le titre pour prévenir XSS
+                const escapedTitle = adminUtils.escapeHtml(conv.title);
+
                 html += `
                     <tr>
                         <td>#${conv.id}</td>
-                        <td>${adminUtils.truncateText(conv.title, 50)}</td>
+                        <td>${adminUtils.truncateText(escapedTitle, 50)}</td>
                         <td>${conv.message_count}</td>
                         <td>${sentimentBadge}</td>
                         <td>${urgencyBadge}</td>

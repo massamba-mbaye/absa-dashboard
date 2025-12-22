@@ -629,6 +629,23 @@ async function copyToClipboard(text, successMessage = '📋 Copié !') {
 }
 
 // ============================================
+// ÉCHAPPEMENT HTML (Protection XSS)
+// ============================================
+
+/**
+ * Échappe les caractères HTML pour prévenir les attaques XSS
+ *
+ * @param {string} text - Texte à échapper
+ * @returns {string} Texte échappé
+ */
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ============================================
 // EXPORT CSV
 // ============================================
 
@@ -831,6 +848,7 @@ window.adminUtils = {
     debounce,
     showLoader,
     hideLoader,
+    escapeHtml,
     logout
 };
 

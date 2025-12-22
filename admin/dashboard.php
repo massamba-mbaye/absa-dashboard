@@ -455,21 +455,25 @@ $adminName = getAdminName();
                     urgencyBadge = '<span style="color: #6b7280;">-</span>';
                 }
                 
-                // Violence
-                const violence = conv.violence_type 
-                    ? `<span class="badge danger">${conv.violence_type}</span>`
+                // Violence (échappé pour prévenir XSS)
+                const violence = conv.violence_type
+                    ? `<span class="badge danger">${adminUtils.escapeHtml(conv.violence_type)}</span>`
                     : '<span style="color: #6b7280;">-</span>';
-                
+
+                // Échapper les données utilisateur
+                const escapedTitle = adminUtils.escapeHtml(conv.title);
+                const escapedEmotion = conv.emotion ? adminUtils.escapeHtml(conv.emotion) : '<span style="color: #6b7280;">-</span>';
+
                 html += `
                     <tr>
                         <td><strong>#${conv.id}</strong></td>
-                        <td class="text-truncate">${conv.title}</td>
+                        <td class="text-truncate">${escapedTitle}</td>
                         <td>
                             <span class="uuid-short" title="${conv.user_id}">${conv.user_id_short}</span>
                         </td>
                         <td>${conv.message_count}</td>
                         <td>${sentimentBadge}</td>
-                        <td>${conv.emotion || '<span style="color: #6b7280;">-</span>'}</td>
+                        <td>${escapedEmotion}</td>
                         <td>${urgencyBadge}</td>
                         <td>${violence}</td>
                         <td>${adminUtils.formatRelativeDate(conv.updated_at)}</td>
