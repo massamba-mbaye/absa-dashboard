@@ -332,10 +332,13 @@ try {
             break;
         
         case 'delete':
+            // Seuls les admins peuvent supprimer des conversations
+            requireRole('admin');
+
             if ($_SERVER['REQUEST_METHOD'] !== 'DELETE' && $_SERVER['REQUEST_METHOD'] !== 'POST') {
                 jsonError('Méthode non autorisée', 405);
             }
-            
+
             $conversationId = 0;
             
             if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
@@ -445,6 +448,9 @@ try {
             break;
         
         case 'export':
+            // Seuls les admins peuvent exporter les données
+            requireRole('admin');
+
             $query = "
                 SELECT 
                     c.id,

@@ -146,6 +146,48 @@ function isViewer() {
 }
 
 /**
+ * Vérifie que l'admin connecté a le rôle requis
+ * Bloque l'accès si le rôle est insuffisant
+ *
+ * @param string $requiredRole Rôle requis ('admin' ou 'viewer')
+ * @return void
+ * @throws Exit si permissions insuffisantes
+ */
+function requireRole($requiredRole = 'admin') {
+    if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+        http_response_code(401);
+        echo json_encode([
+            'success' => false,
+            'error' => 'Non authentifié',
+            'code' => 'UNAUTHORIZED'
+        ]);
+        exit;
+    }
+
+    $currentRole = getAdminRole();
+
+    // Les admins ont toujours accès
+    if ($currentRole === 'admin') {
+        return;
+    }
+
+    // Vérifier si le rôle actuel correspond au rôle requis
+    if ($currentRole !== $requiredRole) {
+        error_log("⚠️ Accès refusé: {$_SESSION['admin_username']} (rôle: $currentRole) a tenté d'accéder à une ressource nécessitant le rôle: $requiredRole");
+
+        http_response_code(403);
+        echo json_encode([
+            'success' => false,
+            'error' => 'Accès refusé: permissions insuffisantes',
+            'code' => 'FORBIDDEN',
+            'required_role' => $requiredRole,
+            'current_role' => $currentRole
+        ]);
+        exit;
+    }
+}
+
+/**
  * Vérifie si l'utilisateur a la permission de modifier
  * Redirige avec erreur si pas de permission
  *

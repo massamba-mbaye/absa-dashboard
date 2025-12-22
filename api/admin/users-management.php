@@ -401,6 +401,9 @@ try {
             break;
         
         case 'export':
+            // Seuls les admins peuvent exporter les données
+            requireRole('admin');
+
             $query = "
                 SELECT 
                     c.wa_id,
