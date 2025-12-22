@@ -223,9 +223,33 @@ $adminName = getAdminName();
     <script src="script-admin.js"></script>
     <script>
         // ============================================
+        // UTILITAIRES
+        // ============================================
+
+        /**
+         * Échappe les caractères HTML pour prévenir XSS
+         * Note: Cette fonction est définie localement car elle est nécessaire
+         * avant le chargement complet de script-admin.js
+         */
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Ajouter à adminUtils s'il n'existe pas encore
+        if (!window.adminUtils) {
+            window.adminUtils = {};
+        }
+        if (!window.adminUtils.escapeHtml) {
+            window.adminUtils.escapeHtml = escapeHtml;
+        }
+
+        // ============================================
         // VARIABLES GLOBALES
         // ============================================
-        
+
         let statsData = null;
         
         // ============================================
